@@ -1,5 +1,7 @@
 import pandas as pd
 from docx import Document
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 
 
 def read_sammlung(path_to_sammlung):
@@ -45,6 +47,20 @@ def add_label(doc, sammler, album, land, code, jv, jb, mv, mb, bv, bb):
 
     add_regular_run(p, "-------------------------------------------------------------------------------------------------------------")
 
+    # Add a box around the text
+    set_paragraph_border(p)
+
+def set_paragraph_border(paragraph):
+    p = paragraph._p  # Access the XML element for the paragraph
+    pPr = p.get_or_add_pPr()
+    # Set border properties
+    for border_name in ['top', 'left', 'bottom', 'right']:
+        border = OxmlElement(f'w:{border_name}')
+        border.set(qn('w:val'), 'single')
+        border.set(qn('w:sz'), '4')  # 1/8 pt, adjust as needed
+        border.set(qn('w:space'), '8')
+        border.set(qn('w:color'), 'auto')
+        pPr.append(border)
 
 def make_codes(path_to_sammlung, path_to_codes, path_to_result):
     sammlung = read_sammlung(path_to_sammlung)
@@ -89,4 +105,3 @@ if __name__ == "__main__":
     ##########################
 
     make_codes(path_to_sammlung, path_to_codes, path_to_result)
-
